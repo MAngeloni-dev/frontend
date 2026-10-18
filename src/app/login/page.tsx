@@ -65,6 +65,7 @@ export default function LoginPage() {
         </p>
 
         <form
+          method="POST"
           onSubmit={handleSubmit(onSubmit)}
           className="mt-8 space-y-5"
         >
