@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-
+import { connection } from "next/server";
 import { djangoGet } from "@/lib/django";
 
 type Paciente = {
@@ -42,6 +42,7 @@ type Props = {
 };
 
 async function PacientesContenido({ searchParams }: Props) {
+  await connection();
   const params = await searchParams;
 
   const search = (params.search || "").trim();
