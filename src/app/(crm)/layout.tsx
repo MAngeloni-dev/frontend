@@ -34,12 +34,36 @@ export default function CRMLayout({
           >
             Tutores
           </Link>
+
+          <Link
+            href="/turnos"
+            className="mt-2 block rounded-lg px-4 py-3 font-medium hover:bg-teal-800"
+          >
+            Turnos
+          </Link>
+
           <Link
             href="/pacientes"
             className="mt-2 block rounded-lg px-4 py-3 font-medium hover:bg-teal-800"
           >
             Pacientes
           </Link>
+
+          <Link
+            href="/medicamentos"
+            className="mt-2 block rounded-lg px-4 py-3 font-medium hover:bg-teal-800"
+          >
+            Medicamentos
+          </Link>
+
+          <Link
+            href="/inventario/alertas"
+            className="mt-2 block rounded-lg px-4 py-3 font-medium hover:bg-teal-800"
+          >
+            Alertas de inventario
+          </Link>
+
+          
         </nav>
       </aside>
 

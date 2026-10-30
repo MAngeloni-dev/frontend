@@ -1,8 +1,11 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 
 import PacienteForm from "@/components/PacienteForm";
 import { djangoGet } from "@/lib/django";
+import { djangoGetAll } from "@/lib/django-list";
 
 type Tutor = {
   id: number;
@@ -22,11 +25,13 @@ type Raza = {
   especie: number;
 };
 
-export default async function NuevoPacientePage({
-  params,
-}: {
+type Props = {
   params: Promise<{ id: string }>;
-}) {
+};
+
+async function NuevoPacienteContenido({ params }: Props) {
+  await connection();
+
   const { id } = await params;
 
   if (!/^[1-9]\d*$/.test(id)) {
@@ -42,29 +47,42 @@ export default async function NuevoPacientePage({
 
   if (!tutor.activo) {
     return (
-      <main>
-        <h1 className="text-2xl font-bold">Tutor inactivo</h1>
+      <>
+        <h1 className="text-2xl font-bold">
+          Tutor inactivo
+        </h1>
+
         <p className="mt-3 text-slate-600">
           Reactivá al tutor antes de agregar un paciente.
         </p>
+
         <Link
           href={`/tutores/${id}`}
           className="mt-4 inline-block text-teal-700 hover:underline"
         >
           Volver a la ficha
         </Link>
-      </main>
+      </>
     );
   }
 
   const [especies, razas] = await Promise.all([
-    djangoGet<Especie[]>("/api/especies/", returnTo),
-    djangoGet<Raza[]>("/api/razas/", returnTo),
+    djangoGetAll<Especie>(
+      "/api/especies/",
+      returnTo,
+    ),
+    djangoGetAll<Raza>(
+      "/api/razas/",
+      returnTo,
+    ),
   ]);
 
   return (
-    <main>
-      <h1 className="text-3xl font-bold">Agregar paciente</h1>
+    <>
+      <h1 className="text-3xl font-bold">
+        Agregar paciente
+      </h1>
+
       <p className="mt-2 text-slate-600">
         Completá los datos del animal.
       </p>
@@ -74,6 +92,38 @@ export default async function NuevoPacientePage({
         especies={especies}
         razas={razas}
       />
+    </>
+  );
+}
+
+function NuevoPacienteLoading() {
+  return (
+    <div aria-busy="true">
+      <h1 className="text-3xl font-bold">
+        Agregar paciente
+      </h1>
+
+      <p
+        role="status"
+        className="mt-2 text-slate-600"
+      >
+        Cargando tutor, especies y razas…
+      </p>
+
+      <div
+        aria-hidden="true"
+        className="mt-6 h-96 max-w-3xl animate-pulse rounded-2xl bg-slate-200"
+      />
+    </div>
+  );
+}
+
+export default function NuevoPacientePage(props: Props) {
+  return (
+    <main>
+      <Suspense fallback={<NuevoPacienteLoading />}>
+        <NuevoPacienteContenido {...props} />
+      </Suspense>
     </main>
   );
 }
