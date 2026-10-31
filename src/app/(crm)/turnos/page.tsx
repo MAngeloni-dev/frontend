@@ -45,11 +45,21 @@ const estados: Record<EstadoTurno, string> = {
 };
 
 const colores: Record<EstadoTurno, string> = {
-  PENDIENTE: "bg-amber-100 text-amber-800",
-  CONFIRMADO: "bg-blue-100 text-blue-800",
-  ATENDIDO: "bg-teal-100 text-teal-800",
-  CANCELADO: "bg-slate-200 text-slate-700",
+  PENDIENTE:
+    "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200",
+  CONFIRMADO:
+    "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200",
+  ATENDIDO:
+    "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200",
+  CANCELADO:
+    "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
 };
+
+const botonPrincipal =
+  "inline-block rounded-lg bg-teal-700 px-5 py-3 text-sm font-medium text-white hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500";
+
+const botonSecundario =
+  "inline-block rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700";
 
 const formatoFecha = new Intl.DateTimeFormat("es-AR", {
   dateStyle: "short",
@@ -57,9 +67,7 @@ const formatoFecha = new Intl.DateTimeFormat("es-AR", {
   timeZone: "America/Argentina/Buenos_Aires",
 });
 
-function primerValor(
-  valor: string | string[] | undefined,
-) {
+function primerValor(valor: string | string[] | undefined) {
   return Array.isArray(valor) ? valor[0] ?? "" : valor ?? "";
 }
 
@@ -68,9 +76,9 @@ async function TurnosContenido({ searchParams }: Props) {
 
   const parametros = await searchParams;
 
-  const busqueda = primerValor(
-    parametros.search,
-  ).trim().slice(0, 150);
+  const busqueda = primerValor(parametros.search)
+    .trim()
+    .slice(0, 150);
 
   const estadoRecibido = primerValor(parametros.estado);
 
@@ -92,13 +100,8 @@ async function TurnosContenido({ searchParams }: Props) {
       page: String(numero),
     });
 
-    if (busqueda) {
-      query.set("search", busqueda);
-    }
-
-    if (estado) {
-      query.set("estado", estado);
-    }
+    if (busqueda) query.set("search", busqueda);
+    if (estado) query.set("estado", estado);
 
     return query;
   }
@@ -116,28 +119,17 @@ async function TurnosContenido({ searchParams }: Props) {
   );
 
   const inputClass =
-    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900";
+    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 placeholder:text-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400";
 
   return (
     <>
-      <header>
-        <h1 className="text-3xl font-bold">Turnos</h1>
-
-        <p className="mt-2 text-slate-600">
-          Consultá la agenda y el estado de las reservas.
-        </p>
-      </header>
-
       <form
         action="/turnos"
         method="GET"
-        className="mt-6 grid items-end gap-4 rounded-2xl border border-slate-200 bg-white p-5 sm:grid-cols-2 lg:grid-cols-4"
+        className="mt-6 grid items-end gap-4 rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-800 sm:grid-cols-2 lg:grid-cols-4"
       >
         <div className="lg:col-span-2">
-          <label
-            htmlFor="search"
-            className="text-sm font-medium"
-          >
+          <label htmlFor="search" className="text-sm font-medium">
             Buscar por paciente, tutor o motivo
           </label>
 
@@ -153,10 +145,7 @@ async function TurnosContenido({ searchParams }: Props) {
         </div>
 
         <div>
-          <label
-            htmlFor="estado"
-            className="text-sm font-medium"
-          >
+          <label htmlFor="estado" className="text-sm font-medium">
             Estado
           </label>
 
@@ -169,47 +158,32 @@ async function TurnosContenido({ searchParams }: Props) {
           >
             <option value="">Todos</option>
 
-            {Object.entries(estados).map(
-              ([valor, etiqueta]) => (
-                <option key={valor} value={valor}>
-                  {etiqueta}
-                </option>
-              ),
-            )}
+            {Object.entries(estados).map(([valor, etiqueta]) => (
+              <option key={valor} value={valor}>
+                {etiqueta}
+              </option>
+            ))}
           </select>
         </div>
 
-        <div className="flex items-center gap-4">
-          <button
-            type="submit"
-            className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800"
-          >
+        <div className="flex flex-wrap items-center gap-4">
+          <button type="submit" className={botonPrincipal}>
             Filtrar
           </button>
 
           <Link
             href="/turnos"
-            className="text-sm font-medium text-slate-600 hover:underline"
+            className="text-sm font-medium text-slate-600 hover:underline dark:text-slate-300"
           >
             Limpiar
-          </Link>
-
-          <Link
-            href="/turnos/nuevo"
-            className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800"
-          >
-            Agendar turno
-          </Link>
-          <Link
-            href="/turnos/calendario"
-            className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800"
-          >
-            Ver calendario
           </Link>
         </div>
       </form>
 
-      <p className="mt-5 text-sm text-slate-600">
+      <p
+        role="status"
+        className="mt-5 text-sm text-slate-600 dark:text-slate-300"
+      >
         {datos.count}{" "}
         {datos.count === 1
           ? "turno encontrado"
@@ -217,12 +191,12 @@ async function TurnosContenido({ searchParams }: Props) {
       </p>
 
       {datos.results.length === 0 ? (
-        <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-8 text-center">
+        <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-8 text-center dark:border-slate-700 dark:bg-slate-800">
           <h2 className="text-lg font-semibold">
             No hay turnos para mostrar
           </h2>
 
-          <p className="mt-2 text-slate-600">
+          <p className="mt-2 text-slate-600 dark:text-slate-300">
             Todavía no se registraron reservas o ninguna
             coincide con los filtros seleccionados.
           </p>
@@ -232,53 +206,51 @@ async function TurnosContenido({ searchParams }: Props) {
           role="region"
           aria-label="Listado de turnos"
           tabIndex={0}
-          className="mt-4 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm focus-visible:outline-2 focus-visible:outline-teal-700"
+          className="mt-4 overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm focus-visible:outline-2 focus-visible:outline-teal-700 dark:border-slate-700 dark:bg-slate-800 dark:focus-visible:outline-teal-300"
         >
           <table className="w-full text-left text-sm">
-            
             <caption className="sr-only">
               Turnos ordenados por fecha de inicio
             </caption>
 
-            <thead className="bg-slate-50 text-slate-600">
+            <thead className="bg-slate-50 text-slate-600 dark:bg-slate-900 dark:text-slate-300">
               <tr>
-                <th scope="col" className="px-5 py-4">
-                  Paciente
-                </th>
-                <th scope="col" className="px-5 py-4">
-                  Veterinario
-                </th>
-                <th scope="col" className="px-5 py-4">
-                  Inicio
-                </th>
-                <th scope="col" className="px-5 py-4">
-                  Fin
-                </th>
-                <th scope="col" className="px-5 py-4">
-                  Motivo
-                </th>
-                <th scope="col" className="px-5 py-4">
-                  Estado
-                </th>
+                {[
+                  "Paciente",
+                  "Veterinario",
+                  "Inicio",
+                  "Fin",
+                  "Motivo",
+                  "Estado",
+                ].map((titulo) => (
+                  <th
+                    key={titulo}
+                    scope="col"
+                    className="px-5 py-4"
+                  >
+                    {titulo}
+                  </th>
+                ))}
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
               {datos.results.map((turno) => (
                 <tr
                   key={turno.id}
-                  className="hover:bg-slate-50"
+                  className="hover:bg-slate-50 dark:hover:bg-slate-700"
                 >
                   <td className="px-5 py-4">
                     <Link
                       href={`/pacientes/${turno.paciente}`}
-                      className="font-semibold text-teal-700 hover:underline"
+                      className="font-semibold text-teal-700 hover:underline dark:text-teal-300"
                     >
                       {turno.paciente_nombre}
                     </Link>
+
                     <Link
                       href={`/turnos/${turno.id}`}
-                      className="mt-1 block text-sm font-medium text-teal-700 hover:underline"
+                      className="mt-1 block text-sm font-medium text-teal-700 hover:underline dark:text-teal-300"
                     >
                       Ver turno →
                     </Link>
@@ -289,15 +261,11 @@ async function TurnosContenido({ searchParams }: Props) {
                   </td>
 
                   <td className="whitespace-nowrap px-5 py-4">
-                    {formatoFecha.format(
-                      new Date(turno.inicio),
-                    )}
+                    {formatoFecha.format(new Date(turno.inicio))}
                   </td>
 
                   <td className="whitespace-nowrap px-5 py-4">
-                    {formatoFecha.format(
-                      new Date(turno.fin),
-                    )}
+                    {formatoFecha.format(new Date(turno.fin))}
                   </td>
 
                   <td className="min-w-48 px-5 py-4">
@@ -322,7 +290,7 @@ async function TurnosContenido({ searchParams }: Props) {
         aria-label="Paginación de turnos"
         className="mt-6 flex flex-wrap items-center justify-between gap-4"
       >
-        <span className="text-sm text-slate-600">
+        <span className="text-sm text-slate-600 dark:text-slate-300">
           Página {pagina}
         </span>
 
@@ -330,7 +298,7 @@ async function TurnosContenido({ searchParams }: Props) {
           {datos.previous && pagina > 1 && (
             <Link
               href={enlacePagina(pagina - 1)}
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50"
+              className={botonSecundario}
             >
               Anterior
             </Link>
@@ -339,7 +307,7 @@ async function TurnosContenido({ searchParams }: Props) {
           {datos.next && (
             <Link
               href={enlacePagina(pagina + 1)}
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50"
+              className={botonSecundario}
             >
               Siguiente
             </Link>
@@ -353,15 +321,16 @@ async function TurnosContenido({ searchParams }: Props) {
 function TurnosLoading() {
   return (
     <div aria-busy="true">
-      <h1 className="text-3xl font-bold">Turnos</h1>
-
-      <p role="status" className="mt-2 text-slate-600">
+      <p
+        role="status"
+        className="mt-6 text-slate-600 dark:text-slate-300"
+      >
         Cargando la agenda…
       </p>
 
       <div
         aria-hidden="true"
-        className="mt-6 h-80 animate-pulse rounded-2xl bg-slate-200"
+        className="mt-6 h-80 animate-pulse rounded-2xl bg-slate-200 dark:bg-slate-800"
       />
     </div>
   );
@@ -369,7 +338,30 @@ function TurnosLoading() {
 
 export default function TurnosPage(props: Props) {
   return (
-    <main>
+    <main className="text-slate-900 dark:text-slate-100">
+      <header className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Turnos</h1>
+
+          <p className="mt-2 text-slate-600 dark:text-slate-300">
+            Consultá la agenda y el estado de las reservas.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/turnos/calendario"
+            className={botonSecundario}
+          >
+            Ver calendario
+          </Link>
+
+          <Link href="/turnos/nuevo" className={botonPrincipal}>
+            Agendar turno
+          </Link>
+        </div>
+      </header>
+
       <Suspense fallback={<TurnosLoading />}>
         <TurnosContenido {...props} />
       </Suspense>

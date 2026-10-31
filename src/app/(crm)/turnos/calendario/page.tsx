@@ -23,10 +23,14 @@ type Props = {
 const zona = "America/Argentina/Buenos_Aires";
 
 const colores: Record<Turno["estado"], string> = {
-  PENDIENTE: "border-amber-200 bg-amber-50 text-amber-900",
-  CONFIRMADO: "border-blue-200 bg-blue-50 text-blue-900",
-  ATENDIDO: "border-teal-200 bg-teal-50 text-teal-900",
-  CANCELADO: "border-slate-200 bg-slate-100 text-slate-500",
+  PENDIENTE:
+    "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200",
+  CONFIRMADO:
+    "border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-200",
+  ATENDIDO:
+    "border-teal-200 bg-teal-50 text-teal-900 dark:border-teal-800 dark:bg-teal-950 dark:text-teal-200",
+  CANCELADO:
+    "border-slate-200 bg-slate-100 text-slate-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300",
 };
 
 const estados: Record<Turno["estado"], string> = {
@@ -35,6 +39,9 @@ const estados: Record<Turno["estado"], string> = {
   ATENDIDO: "Atendido",
   CANCELADO: "Cancelado",
 };
+
+const botonSecundario =
+  "rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700";
 
 function claveMes(anio: number, mes: number) {
   const fecha = new Date(Date.UTC(anio, mes - 1, 1));
@@ -93,8 +100,6 @@ async function CalendarioContenido({ searchParams }: Props) {
   const inicioMes = `${mes}-01T00:00:00-03:00`;
   const finMes = `${mesSiguiente}-01T00:00:00-03:00`;
 
-  // Incluye los turnos que se superponen con el mes,
-  // aunque hayan comenzado en el mes anterior.
   const filtros = new URLSearchParams({
     inicio__lt: finMes,
     fin__gt: inicioMes,
@@ -107,12 +112,13 @@ async function CalendarioContenido({ searchParams }: Props) {
   );
 
   const primerDia = new Date(Date.UTC(anio, numeroMes - 1, 1));
+
   const cantidadDias = new Date(
     Date.UTC(anio, numeroMes, 0),
   ).getUTCDate();
 
-  // Convertimos domingo=0 a una semana que empieza el lunes.
   const espacios = (primerDia.getUTCDay() + 6) % 7;
+
   const cantidadCeldas =
     Math.ceil((espacios + cantidadDias) / 7) * 7;
 
@@ -133,26 +139,30 @@ async function CalendarioContenido({ searchParams }: Props) {
           aria-label="Navegación del calendario"
           className="flex flex-wrap gap-2"
         >
-          <Link
-            href={`/turnos/calendario?mes=${mesAnterior}`}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50"
-          >
-            ← Anterior
-          </Link>
+          {!(anio === 2000 && numeroMes === 1) && (
+            <Link
+              href={`/turnos/calendario?mes=${mesAnterior}`}
+              className={botonSecundario}
+            >
+              ← Anterior
+            </Link>
+          )}
 
           <Link
             href="/turnos/calendario"
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50"
+            className={botonSecundario}
           >
             Mes actual
           </Link>
 
-          <Link
-            href={`/turnos/calendario?mes=${mesSiguiente}`}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50"
-          >
-            Siguiente →
-          </Link>
+          {!(anio === 2100 && numeroMes === 12) && (
+            <Link
+              href={`/turnos/calendario?mes=${mesSiguiente}`}
+              className={botonSecundario}
+            >
+              Siguiente →
+            </Link>
+          )}
         </nav>
       </div>
 
@@ -160,7 +170,7 @@ async function CalendarioContenido({ searchParams }: Props) {
         {Object.entries(estados).map(([estado, nombre]) => (
           <span
             key={estado}
-            className={`rounded-full border px-3 py-1 ${
+            className={`rounded-full border px-3 py-1 font-medium ${
               colores[estado as Turno["estado"]]
             }`}
           >
@@ -169,19 +179,24 @@ async function CalendarioContenido({ searchParams }: Props) {
         ))}
       </div>
 
-      <p className="mt-4 text-sm text-slate-600">
+      <p className="mt-4 text-sm text-slate-600 dark:text-slate-300">
         Horarios de Argentina. Seleccioná un turno para ver
         sus datos y acciones.
       </p>
 
-      <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+      <div
+        role="region"
+        aria-label={`Calendario de ${titulo}`}
+        tabIndex={0}
+        className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm focus-visible:outline-2 focus-visible:outline-teal-600 dark:border-slate-700 dark:bg-slate-800 dark:focus-visible:outline-teal-300"
+      >
         <div className="min-w-[840px]">
-          <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50">
+          <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900">
             {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map(
               (dia) => (
                 <div
                   key={dia}
-                  className="p-3 text-center text-sm font-semibold"
+                  className="p-3 text-center text-sm font-semibold text-slate-600 dark:text-slate-300"
                 >
                   {dia}
                 </div>
@@ -198,15 +213,17 @@ async function CalendarioContenido({ searchParams }: Props) {
                   <div
                     key={indice}
                     aria-hidden="true"
-                    className="min-h-36 border-b border-r border-slate-100 bg-slate-50"
+                    className="min-h-36 border-b border-r border-slate-100 bg-slate-50 dark:border-slate-700 dark:bg-slate-900"
                   />
                 );
               }
 
               const fecha = `${mes}-${String(dia).padStart(2, "0")}`;
+
               const inicioDia = Date.parse(
                 `${fecha}T00:00:00-03:00`,
               );
+
               const finDia = inicioDia + 24 * 60 * 60 * 1000;
 
               const turnosDia = turnos.filter(
@@ -215,20 +232,25 @@ async function CalendarioContenido({ searchParams }: Props) {
                   Date.parse(turno.fin) > inicioDia,
               );
 
+              const esHoy = fecha === hoy;
+
               return (
                 <section
                   key={indice}
                   aria-label={`Turnos del ${dia} de ${titulo}`}
-                  className={`min-h-36 border-b border-r border-slate-100 p-2 ${
-                    fecha === hoy ? "bg-teal-50/50" : ""
+                  className={`min-h-36 border-b border-r border-slate-100 p-2 dark:border-slate-700 ${
+                    esHoy
+                      ? "bg-teal-50/50 dark:bg-teal-950/40"
+                      : "bg-white dark:bg-slate-800"
                   }`}
                 >
                   <time
                     dateTime={fecha}
+                    aria-current={esHoy ? "date" : undefined}
                     className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold ${
-                      fecha === hoy
-                        ? "bg-teal-700 text-white"
-                        : "text-slate-700"
+                      esHoy
+                        ? "bg-teal-700 text-white dark:bg-teal-400 dark:text-slate-950"
+                        : "text-slate-700 dark:text-slate-200"
                     }`}
                   >
                     {dia}
@@ -243,9 +265,9 @@ async function CalendarioContenido({ searchParams }: Props) {
                         <Link
                           key={turno.id}
                           href={`/turnos/${turno.id}`}
-                          className={`block rounded-lg border p-2 text-xs hover:shadow-sm ${colores[turno.estado]}`}
+                          className={`block rounded-lg border p-2 text-xs transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:focus-visible:outline-teal-300 ${colores[turno.estado]}`}
                         >
-                          <span className="block font-semibold">
+                          <span className="block break-words font-semibold">
                             {comienzaHoy
                               ? hora(turno.inicio)
                               : "Continúa"}{" "}
@@ -271,7 +293,10 @@ async function CalendarioContenido({ searchParams }: Props) {
       </div>
 
       {turnos.length === 0 && (
-        <p role="status" className="mt-4 text-slate-600">
+        <p
+          role="status"
+          className="mt-4 text-slate-600 dark:text-slate-300"
+        >
           No hay turnos registrados para este mes.
         </p>
       )}
@@ -281,10 +306,10 @@ async function CalendarioContenido({ searchParams }: Props) {
 
 export default function CalendarioPage(props: Props) {
   return (
-    <main>
+    <main className="text-slate-900 dark:text-slate-100">
       <Link
         href="/turnos"
-        className="text-sm font-medium text-teal-700 hover:underline"
+        className="text-sm font-medium text-teal-700 hover:underline dark:text-teal-300"
       >
         ← Volver al listado
       </Link>
@@ -296,7 +321,7 @@ export default function CalendarioPage(props: Props) {
 
         <Link
           href="/turnos/nuevo"
-          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800"
+          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500"
         >
           Agendar turno
         </Link>
@@ -304,7 +329,10 @@ export default function CalendarioPage(props: Props) {
 
       <Suspense
         fallback={
-          <p role="status" className="mt-6 text-slate-600">
+          <p
+            role="status"
+            className="mt-6 text-slate-600 dark:text-slate-300"
+          >
             Cargando calendario...
           </p>
         }

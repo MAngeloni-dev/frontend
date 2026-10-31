@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import Link from "next/link";
+import { connection } from "next/server";
 
 import { djangoGet } from "@/lib/django";
 
@@ -20,20 +22,31 @@ type TutorResponse = {
 
 type Props = {
   searchParams: Promise<{
-    search?: string;
-    page?: string;
+    search?: string | string[];
+    page?: string | string[];
   }>;
 };
 
-export default async function TutoresPage({
-  searchParams,
-}: Props) {
+const botonSecundario =
+  "inline-block rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700";
+
+async function TutoresContenido({ searchParams }: Props) {
+  await connection();
+
   const params = await searchParams;
-  const search = (params.search || "").trim();
-  const requestedPage = Number(params.page || "1");
+
+  const search =
+    typeof params.search === "string"
+      ? params.search.trim()
+      : "";
+
+  const requestedPage =
+    typeof params.page === "string"
+      ? Number(params.page)
+      : 1;
 
   const page =
-    Number.isInteger(requestedPage) && requestedPage > 0
+    Number.isSafeInteger(requestedPage) && requestedPage > 0
       ? requestedPage
       : 1;
 
@@ -46,7 +59,7 @@ export default async function TutoresPage({
       query.set("search", search);
     }
 
-    return `/tutores?${query.toString()}`;
+    return `/tutores?${query}`;
   }
 
   const query = new URLSearchParams({
@@ -58,27 +71,12 @@ export default async function TutoresPage({
   }
 
   const data = await djangoGet<TutorResponse>(
-    `/api/tutores/?${query.toString()}`,
+    `/api/tutores/?${query}`,
     pageUrl(page),
   );
 
   return (
-    <main>
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold">Tutores</h1>
-
-        <Link
-          href="/tutores/nuevo"
-          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800"
-        >
-          Nuevo tutor
-        </Link>
-      </header>
-
-      <p className="mt-2 text-slate-600">
-        Consultá los responsables de los pacientes.
-      </p>
-
+    <>
       <form
         action="/tutores"
         method="GET"
@@ -94,12 +92,12 @@ export default async function TutoresPage({
           type="search"
           defaultValue={search}
           placeholder="Nombre, apellido, DNI, teléfono o email"
-          className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3"
+          className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
         />
 
         <button
           type="submit"
-          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800"
+          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500"
         >
           Buscar
         </button>
@@ -107,20 +105,23 @@ export default async function TutoresPage({
         {search && (
           <Link
             href="/tutores"
-            className="rounded-lg border border-slate-300 bg-white px-5 py-3"
+            className={`${botonSecundario} flex items-center`}
           >
             Limpiar
           </Link>
         )}
       </form>
 
-      <p className="mt-5 text-sm text-slate-600">
+      <p
+        role="status"
+        className="mt-5 text-sm text-slate-600 dark:text-slate-300"
+      >
         Resultados: {data.count}
       </p>
 
-      <section className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <section className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
         {data.results.length === 0 ? (
-          <p className="p-6 text-slate-600">
+          <p className="p-6 text-slate-600 dark:text-slate-300">
             {search
               ? "No encontramos tutores con esa búsqueda."
               : "Todavía no hay tutores registrados."}
@@ -128,7 +129,11 @@ export default async function TutoresPage({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-slate-600">
+              <caption className="sr-only">
+                Tutores registrados y sus datos de contacto
+              </caption>
+
+              <thead className="bg-slate-50 text-slate-600 dark:bg-slate-900 dark:text-slate-300">
                 <tr>
                   <th scope="col" className="px-6 py-4">
                     Tutor
@@ -145,19 +150,22 @@ export default async function TutoresPage({
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {data.results.map((tutor) => (
-                  <tr key={tutor.id}>
+                  <tr
+                    key={tutor.id}
+                    className="hover:bg-slate-50 dark:hover:bg-slate-700"
+                  >
                     <td className="px-6 py-4 font-medium">
-                        <Link
-                            href={`/tutores/${tutor.id}`}
-                            className="text-teal-700 hover:underline"
-                        >
-                            {tutor.apellido}, {tutor.nombre}
-                        </Link>
+                      <Link
+                        href={`/tutores/${tutor.id}`}
+                        className="text-teal-700 hover:underline dark:text-teal-300"
+                      >
+                        {tutor.apellido}, {tutor.nombre}
+                      </Link>
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className="whitespace-nowrap px-6 py-4">
                       {tutor.telefono || "—"}
                     </td>
 
@@ -167,10 +175,10 @@ export default async function TutoresPage({
 
                     <td className="px-6 py-4">
                       <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
                           tutor.activo
-                            ? "bg-teal-50 text-teal-700"
-                            : "bg-slate-100 text-slate-600"
+                            ? "bg-teal-50 text-teal-700 dark:bg-teal-900 dark:text-teal-200"
+                            : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-200"
                         }`}
                       >
                         {tutor.activo ? "Activo" : "Inactivo"}
@@ -189,17 +197,17 @@ export default async function TutoresPage({
         className="mt-5 flex items-center justify-between gap-4"
       >
         <div>
-          {data.previous && (
+          {data.previous && page > 1 && (
             <Link
               href={pageUrl(page - 1)}
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2"
+              className={botonSecundario}
             >
               Anterior
             </Link>
           )}
         </div>
 
-        <span className="text-sm text-slate-600">
+        <span className="text-sm text-slate-600 dark:text-slate-300">
           Página {page}
         </span>
 
@@ -207,13 +215,58 @@ export default async function TutoresPage({
           {data.next && (
             <Link
               href={pageUrl(page + 1)}
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2"
+              className={botonSecundario}
             >
               Siguiente
             </Link>
           )}
         </div>
       </nav>
+    </>
+  );
+}
+
+function TutoresLoading() {
+  return (
+    <div aria-busy="true" className="mt-6">
+      <p
+        role="status"
+        className="text-slate-600 dark:text-slate-300"
+      >
+        Cargando tutores...
+      </p>
+
+      <div
+        aria-hidden="true"
+        className="mt-4 h-72 animate-pulse rounded-2xl bg-slate-200 dark:bg-slate-800"
+      />
+    </div>
+  );
+}
+
+export default function TutoresPage(props: Props) {
+  return (
+    <main>
+      <header className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+          Tutores
+        </h1>
+
+        <Link
+          href="/tutores/nuevo"
+          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500"
+        >
+          Nuevo tutor
+        </Link>
+      </header>
+
+      <p className="mt-2 text-slate-600 dark:text-slate-300">
+        Consultá los responsables de los pacientes.
+      </p>
+
+      <Suspense fallback={<TutoresLoading />}>
+        <TutoresContenido {...props} />
+      </Suspense>
     </main>
   );
 }
