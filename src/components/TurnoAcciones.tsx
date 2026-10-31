@@ -29,10 +29,12 @@ const etiquetas: Record<Accion, string> = {
 };
 
 const estilos: Record<Accion, string> = {
-  confirmar: "bg-teal-700 text-white hover:bg-teal-800",
+  confirmar:
+    "bg-teal-700 text-white hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500",
   cancelar:
-    "border border-red-300 bg-white text-red-700 hover:bg-red-50",
-  atender: "bg-slate-800 text-white hover:bg-slate-900",
+    "border border-red-300 bg-white text-red-700 hover:bg-red-50 dark:border-red-800 dark:bg-red-950 dark:text-red-200 dark:hover:bg-red-900",
+  atender:
+    "bg-slate-800 text-white hover:bg-slate-900 dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-slate-300",
 };
 
 function mostrarError(data: unknown): string {
@@ -175,7 +177,7 @@ export default function TurnoAcciones({
               disabled={
                 procesando !== null || requiereRevision
               }
-              className={`rounded-lg px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 ${estilos[accion]}`}
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:opacity-50 ${estilos[accion]}`}
             >
               {procesando === accion
                 ? "Procesando..."
@@ -184,7 +186,7 @@ export default function TurnoAcciones({
           ))}
         </div>
       ) : (
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           No hay acciones disponibles para este turno.
         </p>
       )}
@@ -192,7 +194,7 @@ export default function TurnoAcciones({
       {mensaje && (
         <p
           role="status"
-          className="rounded-lg bg-teal-50 p-3 text-sm text-teal-800"
+          className="rounded-lg border border-teal-200 bg-teal-50 p-3 text-sm text-teal-800 dark:border-teal-800 dark:bg-teal-950 dark:text-teal-200"
         >
           {mensaje}
         </p>
@@ -201,7 +203,7 @@ export default function TurnoAcciones({
       {error && (
         <p
           role="alert"
-          className="rounded-lg bg-red-50 p-3 text-sm text-red-700"
+          className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
         >
           {error}
         </p>
@@ -211,7 +213,7 @@ export default function TurnoAcciones({
         <button
           type="button"
           onClick={() => window.location.reload()}
-          className="text-sm font-medium text-teal-700 hover:underline"
+          className="rounded text-sm font-medium text-teal-700 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:text-teal-300"
         >
           Actualizar ficha
         </button>

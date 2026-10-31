@@ -166,7 +166,7 @@ export default function TurnoForm({
   }
 
   const inputClass =
-    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 disabled:bg-slate-100";
+    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 transition-colors placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 disabled:cursor-not-allowed disabled:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:bg-slate-800";
 
   const sinOpciones =
     pacientes.length === 0 || profesionales.length === 0;
@@ -175,9 +175,9 @@ export default function TurnoForm({
     <form
       onSubmit={handleSubmit(onSubmit)}
       noValidate
-      className="mt-6 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+      className="mt-6 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
     >
-      <p className="rounded-xl bg-teal-50 p-4 text-sm text-teal-800">
+      <p className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-800 dark:border-teal-800 dark:bg-teal-950 dark:text-teal-200">
         Los horarios corresponden a la clínica en Argentina
         (UTC−03:00).{" "}
         {turno
@@ -188,7 +188,7 @@ export default function TurnoForm({
       {sinOpciones && (
         <p
           role="alert"
-          className="mt-5 rounded-lg bg-amber-50 p-3 text-sm text-amber-800"
+          className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200"
         >
           {pacientes.length === 0
             ? "No hay pacientes disponibles con tutor activo. "
@@ -235,7 +235,7 @@ export default function TurnoForm({
           {errors.paciente && (
             <p
               id="paciente-error"
-              className="mt-1 text-sm text-red-600"
+              className="mt-1 text-sm text-red-600 dark:text-red-300"
             >
               {errors.paciente.message}
             </p>
@@ -274,7 +274,7 @@ export default function TurnoForm({
           {errors.veterinario && (
             <p
               id="veterinario-error"
-              className="mt-1 text-sm text-red-600"
+              className="mt-1 text-sm text-red-600 dark:text-red-300"
             >
               {errors.veterinario.message}
             </p>
@@ -305,7 +305,7 @@ export default function TurnoForm({
             {errors.inicio && (
               <p
                 id="inicio-error"
-                className="mt-1 text-sm text-red-600"
+                className="mt-1 text-sm text-red-600 dark:text-red-300"
               >
                 {errors.inicio.message}
               </p>
@@ -335,7 +335,7 @@ export default function TurnoForm({
             {errors.fin && (
               <p
                 id="fin-error"
-                className="mt-1 text-sm text-red-600"
+                className="mt-1 text-sm text-red-600 dark:text-red-300"
               >
                 {errors.fin.message}
               </p>
@@ -366,7 +366,7 @@ export default function TurnoForm({
           {errors.motivo && (
             <p
               id="motivo-error"
-              className="mt-1 text-sm text-red-600"
+              className="mt-1 text-sm text-red-600 dark:text-red-300"
             >
               {errors.motivo.message}
             </p>
@@ -403,7 +403,7 @@ export default function TurnoForm({
         <button
           type="submit"
           disabled={isSubmitting || sinOpciones}
-          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white transition-colors hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-teal-600 dark:hover:bg-teal-500"
         >
           {isSubmitting
             ? "Guardando..."
@@ -414,7 +414,7 @@ export default function TurnoForm({
 
         <Link
           href={returnTo}
-          className="text-sm font-medium text-slate-600 hover:underline"
+          className="text-sm font-medium text-slate-600 hover:underline dark:text-slate-300"
         >
           {turno ? "Volver a la ficha" : "Volver al listado"}
         </Link>

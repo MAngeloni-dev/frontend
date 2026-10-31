@@ -162,21 +162,28 @@ export default function PacienteForm({
     }
   }
 
-  const inputClass =
-    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900";
+    const inputClass =
+    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 placeholder:text-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400";
+
+  const errorClass =
+    "mt-1 text-sm text-red-600 dark:text-red-300";
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       noValidate
-      className="mt-6 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+      className="mt-6 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
     >
-      <div className="rounded-xl bg-teal-50 p-4">
-        <p className="text-sm text-teal-700">Tutor</p>
-        <p className="font-semibold text-teal-950">
+      <div className="rounded-xl border border-teal-100 bg-teal-50 p-4 dark:border-teal-800 dark:bg-teal-950">
+        <p className="text-sm text-teal-700 dark:text-teal-300">
+          Tutor
+        </p>
+
+        <p className="font-semibold text-teal-950 dark:text-teal-100">
           {tutor.nombre} {tutor.apellido}
         </p>
-        <p className="mt-1 text-sm text-teal-700">
+
+        <p className="mt-1 text-sm text-teal-700 dark:text-teal-300">
           {paciente
             ? "El paciente conserva su tutor asociado."
             : "El paciente quedará asociado a este tutor."}
@@ -198,11 +205,20 @@ export default function PacienteForm({
                 id={campo.name}
                 type={campo.type}
                 {...register(campo.name)}
+                aria-invalid={!!errors[campo.name]}
+                aria-describedby={
+                  errors[campo.name]
+                    ? `${campo.name}-error`
+                    : undefined
+                }
                 className={inputClass}
               />
 
               {errors[campo.name] && (
-                <p className="mt-1 text-sm text-red-600">
+                <p
+                  id={`${campo.name}-error`}
+                  className={errorClass}
+                >
                   {errors[campo.name]?.message}
                 </p>
               )}
@@ -214,7 +230,7 @@ export default function PacienteForm({
           <input
             type="checkbox"
             {...register("nacimiento_estimado")}
-            className="h-4 w-4 accent-teal-700"
+            className="h-4 w-4 accent-teal-700 dark:accent-teal-400"
           />
           La fecha de nacimiento es estimada
         </label>
@@ -224,6 +240,7 @@ export default function PacienteForm({
             <label htmlFor="especie" className="text-sm font-medium">
               Especie
             </label>
+
             <select
               id="especie"
               {...especieField}
@@ -231,6 +248,10 @@ export default function PacienteForm({
                 void especieField.onChange(event);
                 setValue("raza", "", { shouldValidate: true });
               }}
+              aria-invalid={!!errors.especie}
+              aria-describedby={
+                errors.especie ? "especie-error" : undefined
+              }
               className={inputClass}
             >
               <option value="">Seleccionar especie</option>
@@ -242,7 +263,7 @@ export default function PacienteForm({
             </select>
 
             {errors.especie && (
-              <p className="mt-1 text-sm text-red-600">
+              <p id="especie-error" className={errorClass}>
                 {errors.especie.message}
               </p>
             )}
@@ -252,10 +273,15 @@ export default function PacienteForm({
             <label htmlFor="raza" className="text-sm font-medium">
               Raza
             </label>
+
             <select
               id="raza"
               {...register("raza")}
               disabled={!especieSeleccionada || isSubmitting}
+              aria-invalid={!!errors.raza}
+              aria-describedby={
+                errors.raza ? "raza-error" : undefined
+              }
               className={inputClass}
             >
               <option value="">Sin registrar</option>
@@ -265,36 +291,56 @@ export default function PacienteForm({
                 </option>
               ))}
             </select>
+
+            {errors.raza && (
+              <p id="raza-error" className={errorClass}>
+                {errors.raza.message}
+              </p>
+            )}
           </div>
 
           <div>
             <label htmlFor="sexo" className="text-sm font-medium">
               Sexo
             </label>
+
             <select
               id="sexo"
               {...register("sexo")}
+              aria-invalid={!!errors.sexo}
               className={inputClass}
             >
               <option value="DESCONOCIDO">Desconocido</option>
               <option value="MACHO">Macho</option>
               <option value="HEMBRA">Hembra</option>
             </select>
+
+            {errors.sexo && (
+              <p className={errorClass}>{errors.sexo.message}</p>
+            )}
           </div>
 
           <div>
             <label htmlFor="castrado" className="text-sm font-medium">
               Castrado
             </label>
+
             <select
               id="castrado"
               {...register("castrado")}
+              aria-invalid={!!errors.castrado}
               className={inputClass}
             >
               <option value="DESCONOCIDO">Desconocido</option>
               <option value="SI">Sí</option>
               <option value="NO">No</option>
             </select>
+
+            {errors.castrado && (
+              <p className={errorClass}>
+                {errors.castrado.message}
+              </p>
+            )}
           </div>
         </div>
 
@@ -305,19 +351,27 @@ export default function PacienteForm({
           >
             Observaciones generales — opcional
           </label>
+
           <textarea
             id="observaciones"
             rows={4}
             {...register("observaciones")}
+            aria-invalid={!!errors.observaciones}
             className={inputClass}
           />
+
+          {errors.observaciones && (
+            <p className={errorClass}>
+              {errors.observaciones.message}
+            </p>
+          )}
         </div>
       </fieldset>
 
       {error && (
         <p
           role="alert"
-          className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700"
+          className="mt-5 rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
         >
           {error}
         </p>
@@ -327,7 +381,7 @@ export default function PacienteForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800 disabled:opacity-50 dark:bg-teal-600 dark:hover:bg-teal-500"
         >
           {isSubmitting
             ? "Guardando..."
@@ -338,7 +392,7 @@ export default function PacienteForm({
 
         <Link
           href={returnTo}
-          className="text-sm font-medium text-slate-600 hover:underline"
+          className="text-sm font-medium text-slate-600 hover:underline dark:text-slate-300"
         >
           Volver a la ficha
         </Link>

@@ -1,5 +1,8 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import Link from "next/link";
+import { connection } from "next/server";
+
+import { djangoGet } from "@/lib/django";
 
 type Paciente = {
   id: number;
@@ -12,97 +15,107 @@ type PacientesResponse = {
   results: Paciente[];
 };
 
-export default async function DashboardPage() {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
+async function DashboardContenido() {
+  await connection();
 
-  if (!accessToken) {
-    if (cookieStore.has("refresh_token")) {
-      redirect("/renovar-sesion");
-    }
-
-    redirect("/login");
-  }
-
-  const apiUrl = process.env.DJANGO_API_URL;
-
-  if (!apiUrl) {
-    throw new Error("Falta configurar DJANGO_API_URL.");
-  }
-
-  const response = await fetch(`${apiUrl}/api/pacientes/`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-    cache: "no-store",
-  });
-
-  if (response.status === 401) {
-    if (cookieStore.has("refresh_token")) {
-      redirect("/renovar-sesion");
-    }
-
-    redirect("/login");
-  }
-
-  if (!response.ok) {
-    throw new Error("No se pudo consultar la lista de pacientes.");
-  }
-
-  const data: PacientesResponse = await response.json();
+  const data = await djangoGet<PacientesResponse>(
+    "/api/pacientes/",
+    "/dashboard",
+  );
 
   return (
+    <section className="mt-6 max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+      <p className="text-sm font-medium text-slate-500 dark:text-slate-300">
+        Pacientes registrados
+      </p>
+
+      <p className="mt-2 text-4xl font-bold text-teal-700 dark:text-teal-300">
+        {data.count}
+      </p>
+
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-semibold">
+          Pacientes de esta página
+        </h2>
+
+        <Link
+          href="/pacientes"
+          className="text-sm font-medium text-teal-700 hover:underline dark:text-teal-300"
+        >
+          Ver todos →
+        </Link>
+      </div>
+
+      {data.results.length === 0 ? (
+        <p className="mt-4 text-slate-600 dark:text-slate-300">
+          Todavía no hay pacientes registrados.
+        </p>
+      ) : (
+        <ul className="mt-3 divide-y divide-slate-100 dark:divide-slate-700">
+          {data.results.map((paciente) => (
+            <li
+              key={paciente.id}
+              className="flex items-center justify-between gap-4 py-3"
+            >
+              <Link
+                href={`/pacientes/${paciente.id}`}
+                className="min-w-0 break-words font-medium text-slate-800 hover:text-teal-700 hover:underline dark:text-slate-100 dark:hover:text-teal-300"
+              >
+                {paciente.nombre}
+              </Link>
+
+              <span
+                className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
+                  paciente.activo
+                    ? "bg-teal-50 text-teal-700 dark:bg-teal-900 dark:text-teal-200"
+                    : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-200"
+                }`}
+              >
+                {paciente.activo ? "Activo" : "Inactivo"}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function DashboardLoading() {
+  return (
+    <div
+      aria-busy="true"
+      className="mt-6 max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-800"
+    >
+      <p
+        role="status"
+        className="text-sm text-slate-600 dark:text-slate-300"
+      >
+        Cargando pacientes...
+      </p>
+
+      <div
+        aria-hidden="true"
+        className="mt-4 h-64 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-700"
+      />
+    </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
     <main>
-      <h1 className="text-3xl font-bold text-slate-900">
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
         Inicio
       </h1>
 
-      <p className="mt-2 text-slate-600">
+      <p className="mt-2 text-slate-600 dark:text-slate-300">
         Consultá los pacientes registrados en la clínica.
       </p>
 
-      <section className="mt-8 max-w-xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <p className="text-sm font-medium text-slate-500">
-          Pacientes registrados
-        </p>
-
-        <p className="mt-2 text-4xl font-bold text-teal-700">
-          {data.count}
-        </p>
-
-        <h2 className="mt-6 font-semibold">
-          Listado de pacientes
-        </h2>
-
-        {data.results.length === 0 ? (
-          <p className="mt-4 text-slate-600">
-            Todavía no hay pacientes registrados.
-          </p>
-        ) : (
-          <ul className="mt-3 divide-y divide-slate-100">
-            {data.results.map((paciente) => (
-              <li
-                key={paciente.id}
-                className="flex items-center justify-between gap-4 py-3"
-              >
-                <span className="font-medium">
-                  {paciente.nombre}
-                </span>
-
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-medium ${
-                    paciente.activo
-                      ? "bg-teal-50 text-teal-700"
-                      : "bg-slate-100 text-slate-600"
-                  }`}
-                >
-                  {paciente.activo ? "Activo" : "Inactivo"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <Suspense fallback={<DashboardLoading />}>
+        <DashboardContenido />
+      </Suspense>
     </main>
   );
 }

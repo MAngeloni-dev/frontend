@@ -42,21 +42,34 @@ const estados: Record<
 > = {
   PENDIENTE: {
     nombre: "Pendiente",
-    estilo: "bg-amber-50 text-amber-800",
+    estilo:
+      "bg-amber-50 text-amber-800 dark:bg-amber-950 dark:text-amber-200",
   },
   CONFIRMADO: {
     nombre: "Confirmado",
-    estilo: "bg-blue-50 text-blue-800",
+    estilo:
+      "bg-blue-50 text-blue-800 dark:bg-blue-950 dark:text-blue-200",
   },
   ATENDIDO: {
     nombre: "Atendido",
-    estilo: "bg-teal-50 text-teal-800",
+    estilo:
+      "bg-teal-50 text-teal-800 dark:bg-teal-950 dark:text-teal-200",
   },
   CANCELADO: {
     nombre: "Cancelado",
-    estilo: "bg-red-50 text-red-800",
+    estilo:
+      "bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-200",
   },
 };
+
+const tarjetaClass =
+  "rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100";
+
+const etiquetaClass =
+  "text-sm text-slate-500 dark:text-slate-400";
+
+const enlaceClass =
+  "text-teal-700 hover:underline dark:text-teal-300";
 
 function mostrarFechaHora(valor: string) {
   return new Intl.DateTimeFormat("es-AR", {
@@ -100,27 +113,27 @@ async function TurnoDetalleContenido({ params }: Props) {
             </span>
           </div>
 
-          <p className="mt-2 text-slate-600">
+          <p className="mt-2 break-words text-slate-600 dark:text-slate-300">
             {turno.paciente_nombre} · {turno.motivo}
           </p>
         </div>
       </header>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className={tarjetaClass}>
           <h2 className="text-lg font-semibold">
             Datos del turno
           </h2>
 
           <dl className="mt-5 space-y-5">
             <div>
-              <dt className="text-sm text-slate-500">
+              <dt className={etiquetaClass}>
                 Paciente
               </dt>
-              <dd className="mt-1 font-medium">
+              <dd className="mt-1 break-words font-medium">
                 <Link
                   href={`/pacientes/${turno.paciente}`}
-                  className="text-teal-700 hover:underline"
+                  className={enlaceClass}
                 >
                   {turno.paciente_nombre}
                 </Link>
@@ -128,34 +141,38 @@ async function TurnoDetalleContenido({ params }: Props) {
             </div>
 
             <div>
-              <dt className="text-sm text-slate-500">
+              <dt className={etiquetaClass}>
                 Profesional
               </dt>
-              <dd className="mt-1 font-medium">
+              <dd className="mt-1 break-words font-medium">
                 {turno.veterinario_nombre}
               </dd>
             </div>
 
             <div>
-              <dt className="text-sm text-slate-500">
+              <dt className={etiquetaClass}>
                 Inicio
               </dt>
               <dd className="mt-1 font-medium">
-                {mostrarFechaHora(turno.inicio)}
+                <time dateTime={turno.inicio}>
+                  {mostrarFechaHora(turno.inicio)}
+                </time>
               </dd>
             </div>
 
             <div>
-              <dt className="text-sm text-slate-500">
+              <dt className={etiquetaClass}>
                 Finalización
               </dt>
               <dd className="mt-1 font-medium">
-                {mostrarFechaHora(turno.fin)}
+                <time dateTime={turno.fin}>
+                  {mostrarFechaHora(turno.fin)}
+                </time>
               </dd>
             </div>
 
             <div>
-              <dt className="text-sm text-slate-500">
+              <dt className={etiquetaClass}>
                 Motivo
               </dt>
               <dd className="mt-1 break-words font-medium">
@@ -164,28 +181,31 @@ async function TurnoDetalleContenido({ params }: Props) {
             </div>
           </dl>
 
-          <p className="mt-5 text-xs text-slate-500">
+          <p className="mt-5 text-xs text-slate-500 dark:text-slate-400">
             Horarios de Argentina (UTC−03:00).
           </p>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className={tarjetaClass}>
           <h2 className="text-lg font-semibold">
             Observaciones
           </h2>
 
-          <p className="mt-4 whitespace-pre-wrap break-words text-slate-600">
+          <p className="mt-4 whitespace-pre-wrap break-words text-slate-600 dark:text-slate-300">
             {turno.observaciones ||
               "No hay observaciones registradas."}
           </p>
 
-          <p className="mt-6 text-sm text-slate-500">
+          <p className="mt-6 text-sm text-slate-500 dark:text-slate-400">
             Registrado el{" "}
-            {mostrarFechaHora(turno.fecha_creacion)}.
+            <time dateTime={turno.fecha_creacion}>
+              {mostrarFechaHora(turno.fecha_creacion)}
+            </time>
+            .
           </p>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
+        <section className={`${tarjetaClass} lg:col-span-2`}>
           <h2 className="text-lg font-semibold">
             Acciones del turno
           </h2>
@@ -194,7 +214,7 @@ async function TurnoDetalleContenido({ params }: Props) {
             turno.estado === "CONFIRMADO") && (
             <Link
               href={`/turnos/${turno.id}/editar`}
-              className="mt-4 inline-block rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50"
+              className="mt-4 inline-block rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-700"
             >
               Editar o reprogramar
             </Link>
@@ -217,7 +237,10 @@ async function TurnoDetalleContenido({ params }: Props) {
 function TurnoDetalleLoading() {
   return (
     <div aria-busy="true">
-      <p role="status" className="mt-5 text-slate-600">
+      <p
+        role="status"
+        className="mt-5 text-slate-600 dark:text-slate-300"
+      >
         Cargando los datos del turno...
       </p>
 
@@ -225,8 +248,8 @@ function TurnoDetalleLoading() {
         aria-hidden="true"
         className="mt-6 grid animate-pulse gap-6 lg:grid-cols-2"
       >
-        <div className="h-80 rounded-2xl bg-slate-200" />
-        <div className="h-80 rounded-2xl bg-slate-200" />
+        <div className="h-80 rounded-2xl bg-slate-200 dark:bg-slate-800" />
+        <div className="h-80 rounded-2xl bg-slate-200 dark:bg-slate-800" />
       </div>
     </div>
   );
@@ -234,10 +257,10 @@ function TurnoDetalleLoading() {
 
 export default function TurnoDetallePage(props: Props) {
   return (
-    <main>
+    <main className="text-slate-900 dark:text-slate-100">
       <Link
         href="/turnos"
-        className="text-sm font-medium text-teal-700 hover:underline"
+        className={`text-sm font-medium ${enlaceClass}`}
       >
         ← Volver al listado de turnos
       </Link>
