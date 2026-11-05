@@ -17,7 +17,11 @@ const campos = [
   { name: "dni", label: "DNI — opcional", type: "text" },
   { name: "telefono", label: "Teléfono", type: "tel" },
   { name: "email", label: "Email — opcional", type: "email" },
-  { name: "direccion", label: "Dirección — opcional", type: "text" },
+  {
+    name: "direccion",
+    label: "Dirección — opcional",
+    type: "text",
+  },
 ] as const;
 
 type Props = {
@@ -34,7 +38,7 @@ export default function TutorForm({ tutor }: Props) {
     formState: { errors, isSubmitting },
   } = useForm<TutorFormValues>({
     resolver: zodResolver(tutorSchema),
-      defaultValues: {
+    defaultValues: {
       nombre: tutor?.nombre ?? "",
       apellido: tutor?.apellido ?? "",
       dni: tutor?.dni ?? "",
@@ -106,13 +110,19 @@ export default function TutorForm({ tutor }: Props) {
   }
 
   const inputClass =
-    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900";
+    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 transition-colors placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 disabled:cursor-not-allowed disabled:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:bg-slate-800";
+
+  const labelClass =
+    "text-sm font-medium text-slate-700 dark:text-slate-200";
+
+  const errorClass =
+    "mt-1 text-sm text-red-600 dark:text-red-300";
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       noValidate
-      className="mt-6 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+      className="mt-6 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
     >
       <fieldset disabled={isSubmitting}>
         <div className="grid gap-5 sm:grid-cols-2">
@@ -120,7 +130,7 @@ export default function TutorForm({ tutor }: Props) {
             <div key={campo.name}>
               <label
                 htmlFor={campo.name}
-                className="text-sm font-medium"
+                className={labelClass}
               >
                 {campo.label}
               </label>
@@ -129,11 +139,20 @@ export default function TutorForm({ tutor }: Props) {
                 id={campo.name}
                 type={campo.type}
                 {...register(campo.name)}
+                aria-invalid={!!errors[campo.name]}
+                aria-describedby={
+                  errors[campo.name]
+                    ? `${campo.name}-error`
+                    : undefined
+                }
                 className={inputClass}
               />
 
               {errors[campo.name] && (
-                <p className="mt-1 text-sm text-red-600">
+                <p
+                  id={`${campo.name}-error`}
+                  className={errorClass}
+                >
                   {errors[campo.name]?.message}
                 </p>
               )}
@@ -144,7 +163,7 @@ export default function TutorForm({ tutor }: Props) {
         <div className="mt-5">
           <label
             htmlFor="observaciones"
-            className="text-sm font-medium"
+            className={labelClass}
           >
             Observaciones — opcional
           </label>
@@ -153,15 +172,30 @@ export default function TutorForm({ tutor }: Props) {
             id="observaciones"
             rows={4}
             {...register("observaciones")}
+            aria-invalid={!!errors.observaciones}
+            aria-describedby={
+              errors.observaciones
+                ? "observaciones-error"
+                : undefined
+            }
             className={inputClass}
           />
+
+          {errors.observaciones && (
+            <p
+              id="observaciones-error"
+              className={errorClass}
+            >
+              {errors.observaciones.message}
+            </p>
+          )}
         </div>
       </fieldset>
 
       {error && (
         <p
           role="alert"
-          className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700"
+          className="mt-5 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
         >
           {error}
         </p>
@@ -171,19 +205,18 @@ export default function TutorForm({ tutor }: Props) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white transition-colors hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-teal-600 dark:hover:bg-teal-500"
         >
           {isSubmitting
             ? "Guardando..."
             : tutor
-            ? "Guardar cambios"
-            : "Guardar tutor"
-          }
+              ? "Guardar cambios"
+              : "Guardar tutor"}
         </button>
 
         <Link
           href={tutor ? `/tutores/${tutor.id}` : "/tutores"}
-          className="text-sm text-slate-600 hover:underline"
+          className="rounded text-sm font-medium text-slate-600 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:text-slate-300"
         >
           {tutor ? "Volver a la ficha" : "Volver al listado"}
         </Link>

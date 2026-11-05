@@ -176,28 +176,36 @@ export default function MovimientoStockForm({
   }
 
   const inputClass =
-    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 disabled:bg-slate-100";
+    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 transition-colors placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 disabled:cursor-not-allowed disabled:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:bg-slate-800";
+
+  const labelClass =
+    "text-sm font-medium text-slate-700 dark:text-slate-200";
+
+  const errorClass =
+    "mt-1 text-sm text-red-600 dark:text-red-300";
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       noValidate
-      className="mt-6 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+      className="mt-6 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
     >
-      <div className="rounded-xl bg-teal-50 p-4">
-        <p className="font-semibold text-teal-950">
+      <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 dark:border-teal-800 dark:bg-teal-950">
+        <p className="break-words font-semibold text-teal-950 dark:text-teal-100">
           {lote.medicamento_nombre}
         </p>
-        <p className="mt-1 text-sm text-teal-800">
+
+        <p className="mt-1 break-words text-sm text-teal-800 dark:text-teal-200">
           Lote: {lote.numero}
         </p>
-        <p className="mt-1 text-sm text-teal-800">
+
+        <p className="mt-1 text-sm text-teal-800 dark:text-teal-200">
           Existencias al cargar: {lote.cantidad_actual}
         </p>
       </div>
 
       {soloAjustes && (
-        <p className="mt-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+        <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
           El lote está vencido, inactivo o pertenece a un
           medicamento inactivo. Solo se permite un ajuste de
           salida para registrar el descarte de existencias.
@@ -211,13 +219,17 @@ export default function MovimientoStockForm({
         <input type="hidden" {...register("lote")} />
 
         <div>
-          <label htmlFor="tipo" className="text-sm font-medium">
+          <label htmlFor="tipo" className={labelClass}>
             Tipo de movimiento
           </label>
 
           <select
             id="tipo"
             {...register("tipo")}
+            aria-invalid={!!errors.tipo}
+            aria-describedby={
+              errors.tipo ? "tipo-error" : undefined
+            }
             className={inputClass}
           >
             {tiposDisponibles.map((opcion) => (
@@ -228,17 +240,14 @@ export default function MovimientoStockForm({
           </select>
 
           {errors.tipo && (
-            <p className="mt-1 text-sm text-red-600">
+            <p id="tipo-error" className={errorClass}>
               {errors.tipo.message}
             </p>
           )}
         </div>
 
         <div>
-          <label
-            htmlFor="cantidad"
-            className="text-sm font-medium"
-          >
+          <label htmlFor="cantidad" className={labelClass}>
             Cantidad de unidades
           </label>
 
@@ -248,23 +257,24 @@ export default function MovimientoStockForm({
             inputMode="numeric"
             {...register("cantidad")}
             aria-invalid={!!errors.cantidad}
-            aria-describedby="cantidad-ayuda cantidad-error"
+            aria-describedby={
+              errors.cantidad
+                ? "cantidad-ayuda cantidad-error"
+                : "cantidad-ayuda"
+            }
             className={inputClass}
           />
 
           <p
             id="cantidad-ayuda"
-            className="mt-1 text-xs text-slate-500"
+            className="mt-1 text-xs text-slate-500 dark:text-slate-400"
           >
             Ingresá cuánto sumar o restar, no el stock final.
             Usá un número entero positivo.
           </p>
 
           {errors.cantidad && (
-            <p
-              id="cantidad-error"
-              className="mt-1 text-sm text-red-600"
-            >
+            <p id="cantidad-error" className={errorClass}>
               {errors.cantidad.message}
             </p>
           )}
@@ -273,23 +283,20 @@ export default function MovimientoStockForm({
         {stockEstimado !== null && (
           <p
             aria-live="polite"
-            className={`rounded-lg p-3 text-sm ${
+            className={`rounded-lg border p-3 text-sm ${
               stockEstimado < 0 || stockEstimado > 2147483647
-                ? "bg-red-50 text-red-800"
-                : "bg-slate-100 text-slate-700"
+                ? "border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
+                : "border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200"
             }`}
           >
             Stock estimado después del movimiento:{" "}
-            <strong>{stockEstimado}</strong>.
-            {" "}Las existencias se verificarán al guardar.
+            <strong>{stockEstimado}</strong>. Las existencias
+            se verificarán al guardar.
           </p>
         )}
 
         <div>
-          <label
-            htmlFor="motivo"
-            className="text-sm font-medium"
-          >
+          <label htmlFor="motivo" className={labelClass}>
             Motivo
           </label>
 
@@ -299,11 +306,14 @@ export default function MovimientoStockForm({
             maxLength={255}
             {...register("motivo")}
             aria-invalid={!!errors.motivo}
+            aria-describedby={
+              errors.motivo ? "motivo-error" : undefined
+            }
             className={inputClass}
           />
 
           {errors.motivo && (
-            <p className="mt-1 text-sm text-red-600">
+            <p id="motivo-error" className={errorClass}>
               {errors.motivo.message}
             </p>
           )}
@@ -312,7 +322,7 @@ export default function MovimientoStockForm({
         <div>
           <label
             htmlFor="observaciones"
-            className="text-sm font-medium"
+            className={labelClass}
           >
             Observaciones — opcional
           </label>
@@ -321,15 +331,27 @@ export default function MovimientoStockForm({
             id="observaciones"
             rows={4}
             {...register("observaciones")}
+            aria-invalid={!!errors.observaciones}
+            aria-describedby={
+              errors.observaciones
+                ? "observaciones-error"
+                : undefined
+            }
             className={inputClass}
           />
+
+          {errors.observaciones && (
+            <p id="observaciones-error" className={errorClass}>
+              {errors.observaciones.message}
+            </p>
+          )}
         </div>
       </fieldset>
 
       {error && (
         <p
           role="alert"
-          className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700"
+          className="mt-5 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
         >
           {error}
         </p>
@@ -339,14 +361,16 @@ export default function MovimientoStockForm({
         <button
           type="submit"
           disabled={isSubmitting || requiereRevision}
-          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white transition-colors hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-teal-600 dark:hover:bg-teal-500"
         >
-          {isSubmitting ? "Registrando..." : "Registrar movimiento"}
+          {isSubmitting
+            ? "Registrando..."
+            : "Registrar movimiento"}
         </button>
 
         <Link
           href={returnTo}
-          className="text-sm font-medium text-slate-600 hover:underline"
+          className="rounded text-sm font-medium text-slate-600 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:text-slate-300"
         >
           {requiereRevision
             ? "Revisar existencias"

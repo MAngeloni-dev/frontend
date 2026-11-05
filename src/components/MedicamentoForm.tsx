@@ -209,15 +209,21 @@ export default function MedicamentoForm({ especies }: Props) {
   }
 
   const inputClass =
-    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 disabled:bg-slate-100";
+    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 transition-colors placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 disabled:cursor-not-allowed disabled:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:bg-slate-800";
+
+  const labelClass =
+    "text-sm font-medium text-slate-700 dark:text-slate-200";
+
+  const errorClass =
+    "mt-1 text-sm text-red-600 dark:text-red-300";
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       noValidate
-      className="mt-6 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+      className="mt-6 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
     >
-      <p className="rounded-xl bg-teal-50 p-4 text-sm text-teal-800">
+      <p className="rounded-xl border border-teal-200 bg-teal-50 p-4 text-sm text-teal-800 dark:border-teal-800 dark:bg-teal-950 dark:text-teal-200">
         El medicamento se creará activo y sin existencias.
         Después podrás agregar lotes y registrar sus ingresos.
       </p>
@@ -231,7 +237,7 @@ export default function MedicamentoForm({ especies }: Props) {
             <div key={campo.name}>
               <label
                 htmlFor={campo.name}
-                className="text-sm font-medium"
+                className={labelClass}
               >
                 {campo.label}
               </label>
@@ -253,7 +259,7 @@ export default function MedicamentoForm({ especies }: Props) {
               {errors[campo.name] && (
                 <p
                   id={`${campo.name}-error`}
-                  className="mt-1 text-sm text-red-600"
+                  className={errorClass}
                 >
                   {errors[campo.name]?.message}
                 </p>
@@ -264,7 +270,7 @@ export default function MedicamentoForm({ especies }: Props) {
           <div>
             <label
               htmlFor="contenido_neto"
-              className="text-sm font-medium"
+              className={labelClass}
             >
               Contenido neto por envase
             </label>
@@ -276,20 +282,24 @@ export default function MedicamentoForm({ especies }: Props) {
               placeholder="Ej.: 100 o 2.500"
               {...register("contenido_neto")}
               aria-invalid={!!errors.contenido_neto}
-              aria-describedby="contenido-ayuda"
+              aria-describedby={
+                errors.contenido_neto
+                  ? "contenido-ayuda contenido-error"
+                  : "contenido-ayuda"
+              }
               className={inputClass}
             />
 
             <p
               id="contenido-ayuda"
-              className="mt-1 text-xs text-slate-500"
+              className="mt-1 text-xs text-slate-500 dark:text-slate-400"
             >
               Usá punto para los decimales, sin separador
               de miles. Hasta 3 decimales.
             </p>
 
             {errors.contenido_neto && (
-              <p className="mt-1 text-sm text-red-600">
+              <p id="contenido-error" className={errorClass}>
                 {errors.contenido_neto.message}
               </p>
             )}
@@ -298,7 +308,7 @@ export default function MedicamentoForm({ especies }: Props) {
           <div>
             <label
               htmlFor="unidad_contenido"
-              className="text-sm font-medium"
+              className={labelClass}
             >
               Unidad del contenido
             </label>
@@ -306,6 +316,12 @@ export default function MedicamentoForm({ especies }: Props) {
             <select
               id="unidad_contenido"
               {...register("unidad_contenido")}
+              aria-invalid={!!errors.unidad_contenido}
+              aria-describedby={
+                errors.unidad_contenido
+                  ? "unidad-error"
+                  : undefined
+              }
               className={inputClass}
             >
               {unidadesContenido.map((unidad) => (
@@ -316,7 +332,7 @@ export default function MedicamentoForm({ especies }: Props) {
             </select>
 
             {errors.unidad_contenido && (
-              <p className="mt-1 text-sm text-red-600">
+              <p id="unidad-error" className={errorClass}>
                 {errors.unidad_contenido.message}
               </p>
             )}
@@ -325,7 +341,7 @@ export default function MedicamentoForm({ especies }: Props) {
           <div>
             <label
               htmlFor="via_administracion"
-              className="text-sm font-medium"
+              className={labelClass}
             >
               Vía de administración
             </label>
@@ -333,6 +349,12 @@ export default function MedicamentoForm({ especies }: Props) {
             <select
               id="via_administracion"
               {...register("via_administracion")}
+              aria-invalid={!!errors.via_administracion}
+              aria-describedby={
+                errors.via_administracion
+                  ? "via-error"
+                  : undefined
+              }
               className={inputClass}
             >
               {viasAdministracion.map((via) => (
@@ -343,7 +365,7 @@ export default function MedicamentoForm({ especies }: Props) {
             </select>
 
             {errors.via_administracion && (
-              <p className="mt-1 text-sm text-red-600">
+              <p id="via-error" className={errorClass}>
                 {errors.via_administracion.message}
               </p>
             )}
@@ -352,7 +374,7 @@ export default function MedicamentoForm({ especies }: Props) {
           <div>
             <label
               htmlFor="stock_minimo"
-              className="text-sm font-medium"
+              className={labelClass}
             >
               Stock mínimo de envases
             </label>
@@ -363,24 +385,34 @@ export default function MedicamentoForm({ especies }: Props) {
               inputMode="numeric"
               {...register("stock_minimo")}
               aria-invalid={!!errors.stock_minimo}
+              aria-describedby={
+                errors.stock_minimo
+                  ? "stock-minimo-error"
+                  : undefined
+              }
               className={inputClass}
             />
 
             {errors.stock_minimo && (
-              <p className="mt-1 text-sm text-red-600">
+              <p id="stock-minimo-error" className={errorClass}>
                 {errors.stock_minimo.message}
               </p>
             )}
           </div>
         </div>
 
-        <fieldset className="rounded-xl border border-slate-200 p-4">
-          <legend className="px-1 text-sm font-medium">
+        <fieldset
+          aria-describedby={
+            errors.especies ? "especies-error" : undefined
+          }
+          className="rounded-xl border border-slate-200 p-4 dark:border-slate-600"
+        >
+          <legend className={`px-1 ${labelClass}`}>
             Especies — opcional
           </legend>
 
           {especies.length === 0 ? (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               No hay especies activas disponibles.
             </p>
           ) : (
@@ -388,13 +420,13 @@ export default function MedicamentoForm({ especies }: Props) {
               {especies.map((especie) => (
                 <label
                   key={especie.id}
-                  className="flex items-center gap-2 text-sm"
+                  className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200"
                 >
                   <input
                     type="checkbox"
                     value={String(especie.id)}
                     {...register("especies")}
-                    className="h-4 w-4 accent-teal-700"
+                    className="h-4 w-4 accent-teal-700 dark:accent-teal-400"
                   />
                   {especie.nombre}
                 </label>
@@ -403,7 +435,10 @@ export default function MedicamentoForm({ especies }: Props) {
           )}
 
           {errors.especies && (
-            <p className="mt-2 text-sm text-red-600">
+            <p
+              id="especies-error"
+              className="mt-2 text-sm text-red-600 dark:text-red-300"
+            >
               Revisá las especies seleccionadas.
             </p>
           )}
@@ -412,7 +447,7 @@ export default function MedicamentoForm({ especies }: Props) {
         <div>
           <label
             htmlFor="observaciones"
-            className="text-sm font-medium"
+            className={labelClass}
           >
             Observaciones — opcional
           </label>
@@ -421,15 +456,27 @@ export default function MedicamentoForm({ especies }: Props) {
             id="observaciones"
             rows={4}
             {...register("observaciones")}
+            aria-invalid={!!errors.observaciones}
+            aria-describedby={
+              errors.observaciones
+                ? "observaciones-error"
+                : undefined
+            }
             className={inputClass}
           />
+
+          {errors.observaciones && (
+            <p id="observaciones-error" className={errorClass}>
+              {errors.observaciones.message}
+            </p>
+          )}
         </div>
       </fieldset>
 
       {error && (
         <p
           role="alert"
-          className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700"
+          className="mt-5 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
         >
           {error}
         </p>
@@ -439,14 +486,14 @@ export default function MedicamentoForm({ especies }: Props) {
         <button
           type="submit"
           disabled={isSubmitting || requiereRevision}
-          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white transition-colors hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-teal-600 dark:hover:bg-teal-500"
         >
           {isSubmitting ? "Guardando..." : "Crear medicamento"}
         </button>
 
         <Link
           href="/medicamentos"
-          className="text-sm font-medium text-slate-600 hover:underline"
+          className="rounded text-sm font-medium text-slate-600 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:text-slate-300"
         >
           {requiereRevision
             ? "Revisar listado"

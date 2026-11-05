@@ -130,22 +130,30 @@ export default function LoteForm({ medicamento }: Props) {
   }
 
   const inputClass =
-    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 disabled:bg-slate-100";
+    "mt-1 w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 transition-colors placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/30 disabled:cursor-not-allowed disabled:bg-slate-100 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:disabled:bg-slate-800";
+
+  const labelClass =
+    "text-sm font-medium text-slate-700 dark:text-slate-200";
+
+  const errorClass =
+    "mt-1 text-sm text-red-600 dark:text-red-300";
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
       noValidate
-      className="mt-6 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+      className="mt-6 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
     >
-      <div className="rounded-xl bg-teal-50 p-4">
-        <p className="text-sm text-teal-700">
+      <div className="rounded-xl border border-teal-200 bg-teal-50 p-4 dark:border-teal-800 dark:bg-teal-950">
+        <p className="text-sm text-teal-700 dark:text-teal-300">
           Medicamento
         </p>
-        <p className="font-semibold text-teal-950">
+
+        <p className="break-words font-semibold text-teal-950 dark:text-teal-100">
           {medicamento.nombre}
         </p>
-        <p className="mt-2 text-sm text-teal-800">
+
+        <p className="mt-2 text-sm text-teal-800 dark:text-teal-200">
           El lote comenzará sin existencias. Después de crearlo,
           registrá un ingreso para cargar el stock.
         </p>
@@ -156,10 +164,7 @@ export default function LoteForm({ medicamento }: Props) {
         className="mt-6 space-y-5"
       >
         <div>
-          <label
-            htmlFor="numero"
-            className="text-sm font-medium"
-          >
+          <label htmlFor="numero" className={labelClass}>
             Número de lote
           </label>
 
@@ -176,10 +181,7 @@ export default function LoteForm({ medicamento }: Props) {
           />
 
           {errors.numero && (
-            <p
-              id="numero-error"
-              className="mt-1 text-sm text-red-600"
-            >
+            <p id="numero-error" className={errorClass}>
               {errors.numero.message}
             </p>
           )}
@@ -188,7 +190,7 @@ export default function LoteForm({ medicamento }: Props) {
         <div>
           <label
             htmlFor="fecha_vencimiento"
-            className="text-sm font-medium"
+            className={labelClass}
           >
             Fecha de vencimiento
           </label>
@@ -198,23 +200,24 @@ export default function LoteForm({ medicamento }: Props) {
             type="date"
             {...register("fecha_vencimiento")}
             aria-invalid={!!errors.fecha_vencimiento}
-            aria-describedby="vencimiento-ayuda vencimiento-error"
+            aria-describedby={
+              errors.fecha_vencimiento
+                ? "vencimiento-ayuda vencimiento-error"
+                : "vencimiento-ayuda"
+            }
             className={inputClass}
           />
 
           <p
             id="vencimiento-ayuda"
-            className="mt-1 text-xs text-slate-500"
+            className="mt-1 text-xs text-slate-500 dark:text-slate-400"
           >
             Si la fecha ya pasó, el lote se guardará inactivo
             y no permitirá ingresos de stock.
           </p>
 
           {errors.fecha_vencimiento && (
-            <p
-              id="vencimiento-error"
-              className="mt-1 text-sm text-red-600"
-            >
+            <p id="vencimiento-error" className={errorClass}>
               {errors.fecha_vencimiento.message}
             </p>
           )}
@@ -223,7 +226,7 @@ export default function LoteForm({ medicamento }: Props) {
         <div>
           <label
             htmlFor="observaciones"
-            className="text-sm font-medium"
+            className={labelClass}
           >
             Observaciones — opcional
           </label>
@@ -232,15 +235,27 @@ export default function LoteForm({ medicamento }: Props) {
             id="observaciones"
             rows={4}
             {...register("observaciones")}
+            aria-invalid={!!errors.observaciones}
+            aria-describedby={
+              errors.observaciones
+                ? "observaciones-error"
+                : undefined
+            }
             className={inputClass}
           />
+
+          {errors.observaciones && (
+            <p id="observaciones-error" className={errorClass}>
+              {errors.observaciones.message}
+            </p>
+          )}
         </div>
       </fieldset>
 
       {error && (
         <p
           role="alert"
-          className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700"
+          className="mt-5 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
         >
           {error}
         </p>
@@ -250,14 +265,14 @@ export default function LoteForm({ medicamento }: Props) {
         <button
           type="submit"
           disabled={isSubmitting || requiereRevision}
-          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white transition-colors hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-teal-600 dark:hover:bg-teal-500"
         >
           {isSubmitting ? "Guardando..." : "Crear lote"}
         </button>
 
         <Link
           href={returnTo}
-          className="text-sm font-medium text-slate-600 hover:underline"
+          className="rounded text-sm font-medium text-slate-600 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:text-slate-300"
         >
           {requiereRevision
             ? "Revisar lotes del medicamento"

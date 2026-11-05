@@ -334,7 +334,16 @@ function PacientesLoading() {
 export default function PacientesPage(props: Props) {
   return (
     <main className="text-slate-900 dark:text-slate-100">
-      <h1 className="text-3xl font-bold">Pacientes</h1>
+      <header className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-3xl font-bold">Pacientes</h1>
+
+        <Link
+          href="/pacientes/nuevo"
+          className="rounded-lg bg-teal-700 px-5 py-3 font-medium text-white transition-colors hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:bg-teal-600 dark:hover:bg-teal-500"
+        >
+          Nuevo paciente
+        </Link>
+      </header>
 
       <Suspense fallback={<PacientesLoading />}>
         <PacientesContenido {...props} />

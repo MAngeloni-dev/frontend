@@ -1,4 +1,3 @@
-
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -20,6 +19,31 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/*
+ * Identidad del CRM.
+ * Las clases teal existentes toman los tonos violet.
+ * El login queda fuera de este contenedor.
+ */
+.crm-theme {
+  --color-teal-50: #f5f3ff;
+  --color-teal-100: #ede9fe;
+  --color-teal-200: #ddd6fe;
+  --color-teal-300: #c4b5fd;
+  --color-teal-400: #a78bfa;
+  --color-teal-500: #8b5cf6;
+  --color-teal-600: #7c3aed;
+  --color-teal-700: #6d28d9;
+  --color-teal-800: #7c32f3;
+  --color-teal-900: #8138ee;
+  --color-teal-950: #7331ec;
+
+  --background: #faf8ff;
+}
+
+.dark .crm-theme {
+  --background: #0f172a;
+}
+
 html,
 body {
   min-height: 100%;
@@ -29,5 +53,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  transition: background-color 200ms ease, color 200ms ease;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
 }
