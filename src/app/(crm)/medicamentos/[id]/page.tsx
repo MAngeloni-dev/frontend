@@ -48,6 +48,18 @@ type Props = {
   }>;
 };
 
+const tarjetaClass =
+  "rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100";
+
+const etiquetaClass =
+  "text-sm text-slate-500 dark:text-slate-400";
+
+const enlaceClass =
+  "font-medium text-teal-700 hover:underline dark:text-teal-300";
+
+const botonSecundario =
+  "inline-block rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700";
+
 const vias: Record<string, string> = {
   ORAL: "Oral",
   SUBCUTANEA: "Subcutánea",
@@ -170,15 +182,15 @@ async function MedicamentoContenido({
     <>
       <header className="mt-5">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold">
+          <h1 className="break-words text-3xl font-bold">
             {medicamento.nombre}
           </h1>
 
           <span
             className={`rounded-full px-3 py-1 text-sm font-medium ${
               medicamento.activo
-                ? "bg-teal-50 text-teal-700"
-                : "bg-slate-200 text-slate-600"
+                ? "bg-teal-50 text-teal-700 dark:bg-teal-950 dark:text-teal-200"
+                : "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-200"
             }`}
           >
             {medicamento.activo ? "Activo" : "Inactivo"}
@@ -187,7 +199,7 @@ async function MedicamentoContenido({
       </header>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
+        <section className={`${tarjetaClass} lg:col-span-2`}>
           <h2 className="text-lg font-semibold">
             Datos del medicamento
           </h2>
@@ -195,7 +207,7 @@ async function MedicamentoContenido({
           <dl className="mt-5 grid gap-5 sm:grid-cols-2">
             {datos.map(([etiqueta, valor]) => (
               <div key={etiqueta}>
-                <dt className="text-sm text-slate-500">
+                <dt className={etiquetaClass}>
                   {etiqueta}
                 </dt>
                 <dd className="mt-1 break-words font-medium">
@@ -206,23 +218,23 @@ async function MedicamentoContenido({
           </dl>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <section className={tarjetaClass}>
           <h2 className="text-lg font-semibold">
             Existencias
           </h2>
 
           <dl className="mt-5 space-y-5">
             <div>
-              <dt className="text-sm text-slate-500">
+              <dt className={etiquetaClass}>
                 Stock utilizable
               </dt>
-              <dd className="mt-1 text-3xl font-bold">
+              <dd className="mt-1 text-3xl font-bold text-teal-700 dark:text-teal-300">
                 {medicamento.stock_utilizable}
               </dd>
             </div>
 
             <div>
-              <dt className="text-sm text-slate-500">
+              <dt className={etiquetaClass}>
                 Stock mínimo
               </dt>
               <dd className="mt-1 font-medium">
@@ -232,32 +244,32 @@ async function MedicamentoContenido({
           </dl>
 
           {stockBajo && (
-            <p className="mt-5 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+            <p className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
               Stock bajo: las existencias utilizables son
               menores o iguales al mínimo.
             </p>
           )}
 
           {!medicamento.activo && (
-            <p className="mt-5 rounded-lg bg-slate-100 p-3 text-sm text-slate-700">
+            <p className="mt-5 rounded-lg border border-slate-200 bg-slate-100 p-3 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300">
               Medicamento inactivo. Sus existencias no están
               habilitadas para retiros habituales.
             </p>
           )}
 
-          <p className="mt-4 text-xs text-slate-500">
+          <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">
             El cálculo suma lotes activos no vencidos.
             Las cantidades representan unidades de inventario,
             no el contenido en ml o gramos.
           </p>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-3">
+        <section className={`${tarjetaClass} lg:col-span-3`}>
           <h2 className="text-lg font-semibold">
             Observaciones
           </h2>
 
-          <p className="mt-4 whitespace-pre-wrap break-words text-slate-600">
+          <p className="mt-4 whitespace-pre-wrap break-words text-slate-600 dark:text-slate-300">
             {medicamento.observaciones ||
               "No hay observaciones registradas."}
           </p>
@@ -273,30 +285,30 @@ async function MedicamentoContenido({
           {puedeRegistrarMovimientos && medicamento.activo && (
             <Link
               href={`/medicamentos/${medicamento.id}/lotes/nuevo`}
-              className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800"
+              className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-teal-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 dark:bg-teal-600 dark:hover:bg-teal-500"
             >
               Agregar lote
             </Link>
           )}
         </div>
 
-        <p className="mt-2 text-sm text-slate-600">
+        <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
           {lotes.count} lote{lotes.count === 1 ? "" : "s"}.
           Se incluyen activos, inactivos y vencidos.
         </p>
 
         {lotes.results.length === 0 ? (
-          <p className="mt-4 rounded-xl border border-slate-200 bg-white p-6 text-slate-600">
+          <p className="mt-4 rounded-xl border border-slate-200 bg-white p-6 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
             Todavía no hay lotes registrados.
           </p>
         ) : (
-          <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+          <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200 bg-white text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">
                 Lotes, vencimientos y existencias
               </caption>
 
-              <thead className="border-b border-slate-200 bg-slate-50">
+              <thead className="border-b border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
                 <tr>
                   <th scope="col" className="px-4 py-3">
                     Número de lote
@@ -313,22 +325,26 @@ async function MedicamentoContenido({
                   <th scope="col" className="px-4 py-3">
                     Acciones
                   </th>
-                  
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {lotes.results.map((lote) => {
                   const vencido = lote.fecha_vencimiento < hoy;
 
                   return (
-                    <tr key={lote.id}>
+                    <tr
+                      key={lote.id}
+                      className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-700"
+                    >
                       <td className="px-4 py-4 font-medium">
                         {lote.numero}
                       </td>
 
                       <td className="px-4 py-4">
-                        {mostrarFecha(lote.fecha_vencimiento)}
+                        <time dateTime={lote.fecha_vencimiento}>
+                          {mostrarFecha(lote.fecha_vencimiento)}
+                        </time>
                       </td>
 
                       <td className="px-4 py-4">
@@ -340,25 +356,26 @@ async function MedicamentoContenido({
                           <span
                             className={`rounded-full px-3 py-1 text-xs font-medium ${
                               lote.activo
-                                ? "bg-teal-50 text-teal-700"
-                                : "bg-slate-100 text-slate-600"
+                                ? "bg-teal-50 text-teal-700 dark:bg-teal-950 dark:text-teal-200"
+                                : "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-200"
                             }`}
                           >
                             {lote.activo ? "Activo" : "Inactivo"}
                           </span>
 
                           {vencido && (
-                            <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700">
+                            <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-700 dark:bg-red-950 dark:text-red-200">
                               Vencido
                             </span>
                           )}
                         </div>
                       </td>
+
                       <td className="px-4 py-4">
                         <div className="flex flex-col items-start gap-2">
                           <Link
                             href={`/movimientos-stock?lote=${lote.id}`}
-                            className="font-medium text-teal-700 hover:underline"
+                            className={enlaceClass}
                           >
                             Ver historial
                           </Link>
@@ -366,7 +383,7 @@ async function MedicamentoContenido({
                           {puedeRegistrarMovimientos && (
                             <Link
                               href={`/lotes/${lote.id}/movimientos/nuevo`}
-                              className="font-medium text-teal-700 hover:underline"
+                              className={enlaceClass}
                             >
                               Registrar movimiento
                             </Link>
@@ -388,20 +405,20 @@ async function MedicamentoContenido({
           {lotes.previous && pagina > 1 && (
             <Link
               href={`/medicamentos/${id}?page=${pagina - 1}`}
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50"
+              className={botonSecundario}
             >
               ← Anterior
             </Link>
           )}
 
-          <span className="text-sm text-slate-600">
+          <span className="text-sm text-slate-600 dark:text-slate-300">
             Página {pagina}
           </span>
 
           {lotes.next && (
             <Link
               href={`/medicamentos/${id}?page=${pagina + 1}`}
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50"
+              className={botonSecundario}
             >
               Siguiente →
             </Link>
@@ -414,17 +431,20 @@ async function MedicamentoContenido({
 
 export default function MedicamentoDetallePage(props: Props) {
   return (
-    <main>
+    <main className="text-slate-900 dark:text-slate-100">
       <Link
         href="/medicamentos"
-        className="text-sm font-medium text-teal-700 hover:underline"
+        className={`text-sm ${enlaceClass}`}
       >
         ← Volver a medicamentos
       </Link>
 
       <Suspense
         fallback={
-          <p role="status" className="mt-6 text-slate-600">
+          <p
+            role="status"
+            className="mt-6 text-slate-600 dark:text-slate-300"
+          >
             Cargando medicamento y lotes...
           </p>
         }
