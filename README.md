@@ -21,7 +21,6 @@ Proyecto integrador de Programación III, conectado con el backend de Ingenierí
 - [Instalación y ejecución](#instalacion-y-ejecucion)
 - [Comprobaciones y requisitos de la EFI](#comprobaciones-y-requisitos-de-la-efi)
 - [Organización y despliegue](#organizacion-y-despliegue)
-- [Pendientes de entrega](#pendientes-de-entrega)
 
 [↑ Volver al índice](#indice)
 
@@ -300,18 +299,3 @@ Las tareas se organizan en Trello y los repositorios se sincronizan mediante Git
 El destino previsto es **Vercel para Next.js** y **Render para Django**. Antes de cerrar el despliegue se deben verificar `DJANGO_API_URL`, HTTPS, cookies, orígenes autorizados, acceso a la API y construcción de producción. No se proporcionó una URL pública verificada.
 
 [↑ Volver al índice](#indice)
-
-<a id="pendientes-de-entrega"></a>
-
-## Pendientes de entrega
-
-- [ ] Completar enlaces de Trello e integrantes.
-- [ ] Revisar este documento contra los archivos actuales.
-- [ ] Terminar los estilos claro/oscuro de inventario y sus formularios.
-- [ ] Confirmar qué pantallas de internaciones se incorporarán al frontend; tener endpoints no significa tener interfaz.
-- [ ] Implementar y ejecutar las pruebas automatizadas exigidas.
-- [ ] Verificar lint y build con los scripts reales.
-- [ ] Agregar capturas actuales sin credenciales ni tokens.
-- [ ] Publicar y verificar el despliegue.
-
-El perfil editable y las imágenes por raza se descartaron del alcance actual. El calendario implementado es propio y no depende de Google Calendar.
